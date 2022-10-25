@@ -33,7 +33,10 @@ class VideoBuffer {
     if (chunkIndex in this.chunks) return;
 
     const compressedBuf = await fetch(
-      `/media/${this.chunkPrefix}${chunkIndex.toString().padStart(2, "0")}.zst`
+      (import.meta.env.PROD ? "/badapple" : "") +
+        `/media/${this.chunkPrefix}${chunkIndex
+          .toString()
+          .padStart(2, "0")}.zst`
     ).then((res) => res.arrayBuffer());
 
     const compressed = new Uint8Array(compressedBuf);
