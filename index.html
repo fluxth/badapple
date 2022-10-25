@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bad Apple!</title>
+    <script type="module" crossorigin src="/badapple/assets/index.7cd40c89.js"></script>
+  </head>
+  <body>
+    <div id="app">
+        <style>
+            canvas{border: 2px red solid;}
+        </style>
+      <canvas id="canvas"></canvas>
+      <br>
+      <audio id="music" controls>
+        <source src="/badapple/media/bad_apple.webm" type='audio/webm; codecs="opus"'>
+        <source src="/badapple/media/bad_apple.m4a" type='audio/mp4; codecs="mp4a.40.2"'>
+      </audio>
+      <br>
+      Render Mode:
+      <label>
+        <input name="render-mode" value="block" checked type="radio" />
+        Block
+      </label>
+      <label>
+        <input name="render-mode" value="text" type="radio">
+        Text
+      </label>
+      <label>
+        <input name="render-mode" value="text_inverse" type="radio">
+        Text (Inverse)
+      </label>
+      <label>
+        <input name="render-mode" value="size" type="radio">
+        Size
+      </label>
+    </div>
+    
+  </body>
+</html>
