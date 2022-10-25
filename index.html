@@ -2,12 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <title>Bad Apple!</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+        <style>
+            canvas{border: 2px red solid;}
+        </style>
+      <canvas id="canvas"></canvas>
+      <br>
+      <audio id="music" controls>
+        <source src="/media/bad_apple.webm" type='audio/webm; codecs="opus"'>
+        <source src="/media/bad_apple.m4a" type='audio/mp4; codecs="mp4a.40.2"'>
+      </audio>
+      <br>
+      Render Mode:
+      <label>
+        <input name="render-mode" value="block" checked type="radio" />
+        Block
+      </label>
+      <label>
+        <input name="render-mode" value="text" type="radio">
+        Text
+      </label>
+      <label>
+        <input name="render-mode" value="text_inverse" type="radio">
+        Text (Inverse)
+      </label>
+      <label>
+        <input name="render-mode" value="size" type="radio">
+        Size
+      </label>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
