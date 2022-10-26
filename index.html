@@ -4,17 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bad Apple!</title>
-    <script type="module" crossorigin src="/badapple/assets/index.bccd185b.js"></script>
-    <link rel="stylesheet" href="/badapple/assets/index.a15cfd80.css">
+    <script type="module" crossorigin src="/badapple/assets/index.7799538c.js"></script>
+    <link rel="stylesheet" href="/badapple/assets/index.468a1c25.css">
   </head>
   <body class="bg-black text-white">
     <div id="app" class="max-h-screen overflow-hidden">
       <div class="w-full bg-black relative">
-        <div id="render-area" class="w-full flex justify-center">
-          <canvas id="canvas" class="bg-white max-w-full" style="max-height: calc(100vh - 2.5rem)"></canvas>
+        <div id="player-area" class="w-full flex justify-center items-center">
+          <canvas id="canvas" class="bg-white"></canvas>
         </div>
-        <div class="px-2 absolute bg-black right-0 bottom-0 flex flex-col opacity-60">
-          Render Mode:
+        <div
+          id="settings-panel"
+          class="px-4 py-2 absolute text-sm bg-black/50 right-2 bottom-2 flex flex-col rounded-lg backdrop-blur -hadow"
+        >
+          <h2 class="font-bold">Render Mode:</h2>
           <label>
             <input name="render-mode" value="block" checked type="radio" />
             Block
@@ -44,8 +47,18 @@
           <button id="player-button-play">
             <i class="fa-solid fa-fw fa-play"></i>
           </button>
-          <button><i class="fa-solid fa-fw fa-volume-high"></i></button>
-          <div id="player-current-time" class="block text-center w-10 text-sm">
+          <div id="player-volume" class="relative h-full flex">
+            <div
+              class="overlay hidden absolute top-0 h-24 w-8 -mt-24 -ml-1 bg-gray-700 rounded-tl rounded-tr"
+            >
+              <input id="player-volume-slider" type="range" value="100" class="-rotate-90 w-20 -ml-6 mt-10" />
+            </div>
+            <button id="player-button-volume"><i class="fa-solid fa-fw fa-volume-high"></i></button>
+          </div>
+          <div
+            id="player-current-time"
+            class="block text-center w-10 text-sm"
+          >
             0:00
           </div>
           <div class="flex-1">
@@ -72,7 +85,9 @@
               ></div>
             </div>
           </div>
-          <button><i class="fa-solid fa-fw fa-cog"></i></button>
+          <button id="player-button-settings">
+            <i class="fa-solid fa-fw fa-cog"></i>
+          </button>
         </div>
       </div>
       <audio id="music">
