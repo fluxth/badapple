@@ -131,7 +131,7 @@ class VideoBuffer {
           const charIndex = Math.floor(luminance * ASCII_RAMP.length);
           const char = ASCII_RAMP[charIndex];
 
-          if (char === " ") continue;
+          if (char === undefined || char === " ") continue;
 
           ctx.fillStyle =
             this.mode === RenderMode.TextInverse ? "white" : "black";
