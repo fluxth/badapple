@@ -5,39 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bad Apple!</title>
   </head>
-  <body>
-    <div id="app">
-        <style>
-            canvas{border: 2px red solid;}
-        </style>
-      <canvas id="canvas"></canvas>
-      <br>
-      <audio id="music" controls>
-        <source src="/media/bad_apple.webm" type='audio/webm; codecs="opus"'>
-        <source src="/media/bad_apple.m4a" type='audio/mp4; codecs="mp4a.40.2"'>
+  <body class="bg-black text-white">
+    <div id="app" class="max-h-screen overflow-hidden">
+      <div class="w-full bg-black relative">
+        <div id="render-area" class="w-full flex justify-center">
+          <canvas id="canvas" class="bg-white max-w-full" style="max-height: calc(100vh - 2.5rem)"></canvas>
+        </div>
+        <div class="px-2 absolute bg-black right-0 bottom-0 flex flex-col opacity-60">
+          Render Mode:
+          <label>
+            <input name="render-mode" value="block" checked type="radio" />
+            Block
+          </label>
+          <label>
+            <input name="render-mode" value="text" type="radio" />
+            Text
+          </label>
+          <label>
+            <input name="render-mode" value="text_inverse" type="radio" />
+            Text (Inverse)
+          </label>
+          <label>
+            <input name="render-mode" value="size" type="radio" />
+            Size
+          </label>
+          <label>
+            <input name="render-mode" value="diff" type="radio" />
+            Differential
+          </label>
+        </div>
+      </div>
+      <div
+        class="w-full h-10 bg-gradient-to-b from-gray-700 to-gray-900 border-t border-gray-800"
+      >
+        <div class="w-full h-full flex gap-4 items-center px-4">
+          <button id="player-button-play">
+            <i class="fa-solid fa-fw fa-play"></i>
+          </button>
+          <button><i class="fa-solid fa-fw fa-volume-high"></i></button>
+          <div id="player-current-time" class="block text-center w-10 text-sm">
+            0:00
+          </div>
+          <div class="flex-1">
+            <div class="h-2 relative">
+              <div
+                id="player-bar"
+                class="w-full h-full overflow-hidden cursor-pointer"
+              >
+                <div
+                  class="h-full w-full bg-gradient-to-b from-gray-400 to-gray-200 rounded-full pointer-events-none"
+                ></div>
+                <div
+                  id="player-buffer-bar"
+                  class="h-full absolute top-0 bg-gradient-to-b from-gray-500 to-gray-600 rounded-full pointer-events-none"
+                ></div>
+                <div
+                  id="player-progress-bar"
+                  class="h-full absolute top-0 bg-gradient-to-b from-red-600 to-red-700 rounded-full pointer-events-none"
+                ></div>
+              </div>
+              <div
+                id="player-seek-handle"
+                class="h-4 w-4 -ml-2 absolute rounded-full -top-1 left-0 bg-red-600 drop-shadow-lg"
+              ></div>
+            </div>
+          </div>
+          <button><i class="fa-solid fa-fw fa-cog"></i></button>
+        </div>
+      </div>
+      <audio id="music">
+        <source src="/media/bad_apple.webm" type='audio/webm; codecs="opus"' />
+        <source
+          src="/media/bad_apple.m4a"
+          type='audio/mp4; codecs="mp4a.40.2"'
+        />
       </audio>
-      <br>
-      Render Mode:
-      <label>
-        <input name="render-mode" value="block" checked type="radio" />
-        Block
-      </label>
-      <label>
-        <input name="render-mode" value="text" type="radio">
-        Text
-      </label>
-      <label>
-        <input name="render-mode" value="text_inverse" type="radio">
-        Text (Inverse)
-      </label>
-      <label>
-        <input name="render-mode" value="size" type="radio">
-        Size
-      </label>
-      <label>
-        <input name="render-mode" value="diff" type="radio">
-        Differential
-      </label>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

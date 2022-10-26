@@ -1,4 +1,9 @@
+import "./index.css";
+
 import * as fzstd from "fzstd";
+
+import "@fortawesome/fontawesome-free/js/solid.js";
+import "@fortawesome/fontawesome-free/js/fontawesome.js";
 
 import { LUMINANCE_PALETTE, COLOR_PALETTE, ASCII_RAMP } from "./xterm";
 
@@ -159,7 +164,7 @@ class VideoBuffer {
     return;
   }
 
-  ctx.font = "bold 6px Monospace";
+  ctx.font = "bold 6px Courier New";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
@@ -179,6 +184,54 @@ class VideoBuffer {
       buffer.render(getCurrentFrame(), ctx);
     }
   }, 1000 / 30);
+
+  const player = {
+    seekHandle: document.getElementById("player-seek-handle") as HTMLDivElement,
+    bar: document.getElementById("player-bar") as HTMLDivElement,
+    progressBar: document.getElementById(
+      "player-progress-bar"
+    ) as HTMLDivElement,
+    bufferBar: document.getElementById("player-buffer-bar") as HTMLDivElement,
+    labels: {
+      currentTime: document.getElementById(
+        "player-current-time"
+      ) as HTMLDivElement,
+    },
+    buttons: {
+      play: document.getElementById("player-button-play") as HTMLButtonElement,
+    },
+  };
+
+  const togglePlayState = () => {
+    if (audio.paused) {
+      audio.play();
+      player.buttons.play.innerHTML = '<i class="fa-solid fa-fw fa-pause"></i>';
+    } else {
+      audio.pause();
+      player.buttons.play.innerHTML = '<i class="fa-solid fa-fw fa-play"></i>';
+    }
+  };
+
+  document
+    .getElementById("render-area")
+    ?.addEventListener("click", togglePlayState);
+  player.buttons.play.addEventListener("click", togglePlayState);
+
+  player.bar.addEventListener("click", (event) => {
+    const element = event.target as HTMLDivElement | undefined;
+    if (!element) return;
+
+    const newProgress = event.offsetX / element.offsetWidth;
+    audio.currentTime = newProgress * audio.duration;
+  });
+
+  audio.addEventListener("timeupdate", () => {
+    const progressPercentage = (audio.currentTime / audio.duration) * 100;
+    player.seekHandle.style.left = `${progressPercentage}%`;
+    player.progressBar.style.width = `${progressPercentage}%`;
+    //player.bufferBar.style.width = `${progressPercentage + 4}%`;
+    player.labels.currentTime.innerText = formatTime(audio.currentTime);
+  });
 
   document.querySelectorAll('input[name="render-mode"]').forEach((item) => {
     item.addEventListener("change", () => {
@@ -212,3 +265,24 @@ class VideoBuffer {
     });
   });
 })();
+
+function formatTime(sec_num: number): string {
+  const hours = Math.floor(sec_num / 3600);
+  const minutes = Math.floor((sec_num - hours * 3600) / 60);
+  const seconds = Math.floor(sec_num - hours * 3600 - minutes * 60);
+
+  let out = "";
+
+  if (hours) {
+    if (hours < 10) out += "0";
+    out += `${hours}:`;
+  }
+
+  if (hours && minutes < 10) out += "0";
+  out += `${minutes}:`;
+
+  if (seconds < 10) out += "0";
+  out += `${seconds}`;
+
+  return out;
+}
