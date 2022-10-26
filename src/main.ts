@@ -10,6 +10,7 @@ enum RenderMode {
   Text,
   TextInverse,
   Size,
+  Differential,
 }
 
 class VideoBuffer {
@@ -90,7 +91,8 @@ class VideoBuffer {
     frame: Uint8Array,
     prevFrame?: Uint8Array
   ) {
-    if (!prevFrame) ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+    if (!prevFrame || this.mode === RenderMode.Differential)
+      ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
     for (let y = 0; y < this.HEIGHT; ++y) {
       for (let x = 0; x < this.WIDTH; ++x) {
@@ -98,9 +100,14 @@ class VideoBuffer {
         if (!color) continue;
 
         if (prevFrame && prevFrame[y * this.WIDTH + x] === color) {
-          continue;
+          if (this.mode !== RenderMode.Differential) continue;
         } else {
-          ctx.clearRect(6 * x, 6 * y, 6, 6);
+          if (this.mode === RenderMode.Differential) {
+            ctx.fillStyle = "red";
+            ctx.fillRect(6 * x, 6 * y, 6, 6);
+          } else {
+            ctx.clearRect(6 * x, 6 * y, 6, 6);
+          }
         }
 
         if (this.mode === RenderMode.Block) {
@@ -126,6 +133,9 @@ class VideoBuffer {
           const size = 6 * (1 + -LUMINANCE_PALETTE[color]);
           const pad = (6 - size) / 2;
           ctx.fillRect(6 * x + pad, 6 * y + pad, size, size);
+        } else if (this.mode === RenderMode.Differential) {
+          ctx.fillStyle = COLOR_PALETTE[color];
+          ctx.fillRect(6 * x + 1, 6 * y + 1, 4, 4);
         }
       }
     }
@@ -189,6 +199,9 @@ class VideoBuffer {
           break;
         case "size":
           mode = RenderMode.Size;
+          break;
+        case "diff":
+          mode = RenderMode.Differential;
           break;
       }
 
