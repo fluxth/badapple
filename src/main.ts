@@ -14,6 +14,7 @@ enum RenderMode {
   Text,
   TextInverse,
   Size,
+  SizeInverse,
   Differential,
 }
 
@@ -141,10 +142,18 @@ class VideoBuffer {
           ctx.fillStyle =
             this.mode === RenderMode.TextInverse ? "white" : "black";
           ctx.fillText(char, s * x + s / 2, s * y + s / 2, s);
-        } else if (this.mode === RenderMode.Size) {
-          ctx.fillStyle = "black";
-          const size = s * (1 + -LUMINANCE_PALETTE[color]);
+        } else if (
+          this.mode === RenderMode.Size ||
+          this.mode === RenderMode.SizeInverse
+        ) {
+          let luminance = LUMINANCE_PALETTE[color];
+          if (this.mode !== RenderMode.SizeInverse) luminance = 1 + -luminance;
+
+          const size = s * luminance;
           const pad = (s - size) / 2;
+
+          ctx.fillStyle =
+            this.mode === RenderMode.SizeInverse ? "white" : "black";
           ctx.fillRect(s * x + pad, s * y + pad, size, size);
         } else if (this.mode === RenderMode.Differential) {
           ctx.fillStyle = COLOR_PALETTE[color];
@@ -343,6 +352,10 @@ class VideoBuffer {
           break;
         case "size":
           mode = RenderMode.Size;
+          break;
+        case "size_inverse":
+          canvas.style.backgroundColor = "black";
+          mode = RenderMode.SizeInverse;
           break;
         case "diff":
           mode = RenderMode.Differential;
