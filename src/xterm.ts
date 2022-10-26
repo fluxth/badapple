@@ -334,5 +334,6 @@ export const LUMINANCE_PALETTE = [
   0.7763929411764706, 0.8156047058823528, 0.8548164705882353,
   0.8940282352941176, 0.9332399999999998,
 ];
+
 export const ASCII_RAMP =
-  "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+  "MWNQKB#mHX$EqRpgAdb8k4ywDh@TZUxSFPVG269O0eY&z5L%nfsu3vCajJot><Ir1lc*7][i/\\})({?|!=+^\"_~;,:'-`. ";

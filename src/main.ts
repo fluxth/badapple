@@ -212,7 +212,7 @@ class VideoBuffer {
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = `bold ${buffer.getScalingFactor(canvas)}px Courier New`;
+    ctx.font = `bold ${buffer.getScalingFactor(canvas)}px Courier`;
 
     return ctx;
   };
