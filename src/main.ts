@@ -20,7 +20,7 @@ class VideoBuffer {
 
   private chunkPrefix = "bad_apple_160x120_xterm256_chunk";
   private frameSizeBytes = 0;
-  private chunks: { [index: number]: any } = {};
+  private chunks: { [index: number]: Uint8Array | null } = {};
   private prevFrameBuffer: Uint8Array | null = null;
 
   forceFullRender = false;
@@ -32,6 +32,8 @@ class VideoBuffer {
 
   async loadChunk(chunkIndex: number) {
     if (chunkIndex in this.chunks) return;
+
+    this.chunks[chunkIndex] = null;
 
     const compressedBuf = await fetch(
       (import.meta.env.PROD ? "/badapple" : "") +
