@@ -7,8 +7,6 @@ import "@fortawesome/fontawesome-free/js/fontawesome.js";
 
 import { LUMINANCE_PALETTE, COLOR_PALETTE, ASCII_RAMP } from "./xterm";
 
-const CANVAS_W = 960;
-const CANVAS_H = 720;
 const VOLUME_CAP = 0.3;
 
 enum RenderMode {
@@ -94,13 +92,20 @@ class VideoBuffer {
       this.loadChunk(chunkIndex + 1);
   }
 
+  getScalingFactor(canvas: HTMLCanvasElement): number {
+    return canvas.width / this.WIDTH;
+  }
+
   private decodeAndDrawFrame(
     ctx: CanvasRenderingContext2D,
     frame: Uint8Array,
     prevFrame?: Uint8Array
   ) {
+    // Scaling factor
+    const s = this.getScalingFactor(ctx.canvas);
+
     if (!prevFrame || this.mode === RenderMode.Differential)
-      ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     for (let y = 0; y < this.HEIGHT; ++y) {
       for (let x = 0; x < this.WIDTH; ++x) {
@@ -112,15 +117,15 @@ class VideoBuffer {
         } else {
           if (this.mode === RenderMode.Differential) {
             ctx.fillStyle = "red";
-            ctx.fillRect(6 * x, 6 * y, 6, 6);
+            ctx.fillRect(s * x, s * y, s, s);
           } else {
-            ctx.clearRect(6 * x, 6 * y, 6, 6);
+            ctx.clearRect(s * x, s * y, s, s);
           }
         }
 
         if (this.mode === RenderMode.Block) {
           ctx.fillStyle = COLOR_PALETTE[color];
-          ctx.fillRect(6 * x, 6 * y, 6, 6);
+          ctx.fillRect(s * x, s * y, s, s);
         } else if (
           this.mode === RenderMode.Text ||
           this.mode === RenderMode.TextInverse
@@ -135,15 +140,22 @@ class VideoBuffer {
 
           ctx.fillStyle =
             this.mode === RenderMode.TextInverse ? "white" : "black";
-          ctx.fillText(char, 6 * x + 3, 6 * y + 3, 6);
+          ctx.fillText(char, s * x + s / 2, s * y + s / 2, s);
         } else if (this.mode === RenderMode.Size) {
           ctx.fillStyle = "black";
-          const size = 6 * (1 + -LUMINANCE_PALETTE[color]);
-          const pad = (6 - size) / 2;
-          ctx.fillRect(6 * x + pad, 6 * y + pad, size, size);
+          const size = s * (1 + -LUMINANCE_PALETTE[color]);
+          const pad = (s - size) / 2;
+          ctx.fillRect(s * x + pad, s * y + pad, size, size);
         } else if (this.mode === RenderMode.Differential) {
           ctx.fillStyle = COLOR_PALETTE[color];
-          ctx.fillRect(6 * x + 1, 6 * y + 1, 4, 4);
+          let border = Math.floor(s / 6);
+          if (border < 1) border = 1;
+          ctx.fillRect(
+            s * x + border,
+            s * y + border,
+            s - border * 2,
+            s - border * 2
+          );
         }
       }
     }
@@ -156,8 +168,14 @@ class VideoBuffer {
   buffer.loadChunk(0);
 
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-  canvas.width = CANVAS_W;
-  canvas.height = CANVAS_H;
+
+  document.querySelectorAll('input[name="render-scaling"]').forEach((item) => {
+    item.addEventListener("change", () => {
+      if (!(item instanceof HTMLInputElement)) return;
+      buffer.forceFullRender = true;
+      changeScaling(parseInt(item.value));
+    });
+  });
 
   const playerArea = document.getElementById("player-area") as HTMLDivElement;
 
@@ -176,15 +194,19 @@ class VideoBuffer {
   window.addEventListener("resize", resizeHandler);
   resizeHandler();
 
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    alert("no");
-    return;
-  }
+  const getContext = () => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      alert("Unable to get context!");
+      throw "Unable to get context";
+    }
 
-  ctx.font = "bold 6px Courier New";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `bold ${buffer.getScalingFactor(canvas)}px Courier New`;
+
+    return ctx;
+  };
 
   const audio = document.getElementById("music") as HTMLAudioElement;
   audio.volume = VOLUME_CAP;
@@ -194,8 +216,19 @@ class VideoBuffer {
   audio.addEventListener("seeked", () => {
     buffer.loadChunkForFrame(getCurrentFrame());
     buffer.forceFullRender = true;
-    buffer.render(getCurrentFrame(), ctx);
+    buffer.render(getCurrentFrame(), getContext());
   });
+
+  let ctx = getContext();
+
+  const changeScaling = (factor: number) => {
+    canvas.width = buffer.WIDTH * factor;
+    canvas.height = buffer.HEIGHT * factor;
+
+    ctx = getContext();
+  };
+
+  changeScaling(9); // default to 1080p
 
   setInterval(() => {
     if (!audio.paused) {
@@ -305,8 +338,8 @@ class VideoBuffer {
           mode = RenderMode.Text;
           break;
         case "text_inverse":
-          mode = RenderMode.TextInverse;
           canvas.style.backgroundColor = "black";
+          mode = RenderMode.TextInverse;
           break;
         case "size":
           mode = RenderMode.Size;
