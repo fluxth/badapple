@@ -16,3 +16,11 @@
   width: auto;
   height: 100%;
 }
+
+#player-volume:hover .overlay {
+  display: block;
+}
+
+#player-volume:focus .overlay {
+  display: block;
+}

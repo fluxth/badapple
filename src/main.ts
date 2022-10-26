@@ -9,6 +9,7 @@ import { LUMINANCE_PALETTE, COLOR_PALETTE, ASCII_RAMP } from "./xterm";
 
 const CANVAS_W = 960;
 const CANVAS_H = 720;
+const VOLUME_CAP = 0.3;
 
 enum RenderMode {
   Block,
@@ -186,7 +187,7 @@ class VideoBuffer {
   ctx.textBaseline = "middle";
 
   const audio = document.getElementById("music") as HTMLAudioElement;
-  audio.volume = 0.2;
+  audio.volume = VOLUME_CAP;
 
   const getCurrentFrame = () => Math.floor(audio.currentTime * 30 + 6);
 
@@ -209,6 +210,9 @@ class VideoBuffer {
       "player-progress-bar"
     ) as HTMLDivElement,
     bufferBar: document.getElementById("player-buffer-bar") as HTMLDivElement,
+    volumeSlider: document.getElementById(
+      "player-volume-slider"
+    ) as HTMLInputElement,
     labels: {
       currentTime: document.getElementById(
         "player-current-time"
@@ -216,6 +220,15 @@ class VideoBuffer {
     },
     buttons: {
       play: document.getElementById("player-button-play") as HTMLButtonElement,
+      settings: document.getElementById(
+        "player-button-settings"
+      ) as HTMLButtonElement,
+      volume: document.getElementById(
+        "player-button-volume"
+      ) as HTMLButtonElement,
+    },
+    panels: {
+      settings: document.getElementById("settings-panel") as HTMLDivElement,
     },
   };
 
@@ -231,6 +244,34 @@ class VideoBuffer {
 
   playerArea.addEventListener("click", togglePlayState);
   player.buttons.play.addEventListener("click", togglePlayState);
+
+  player.buttons.settings.addEventListener("click", () => {
+    const panel = player.panels.settings;
+    if (panel.style.display === "none") panel.style.display = "flex";
+    else panel.style.display = "none";
+  });
+
+  const setVolume = (fullVolume: number) => {
+    const volume = fullVolume * VOLUME_CAP;
+    player.volumeSlider.value = `${fullVolume * 100}`;
+    audio.volume = volume;
+
+    if (volume === 0)
+      player.buttons.volume.innerHTML =
+        '<i class="fa-solid fa-fw fa-volume-mute"></i>';
+    else
+      player.buttons.volume.innerHTML =
+        '<i class="fa-solid fa-fw fa-volume-high"></i>';
+  };
+
+  player.volumeSlider.addEventListener("change", () => {
+    setVolume(parseInt(player.volumeSlider.value) / 100);
+  });
+
+  player.buttons.volume.addEventListener("click", () => {
+    if (audio.volume === 0) setVolume(1);
+    else setVolume(0);
+  });
 
   player.bar.addEventListener("click", (event) => {
     const element = event.target as HTMLDivElement | undefined;
