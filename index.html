@@ -8,10 +8,12 @@
   <body class="bg-black text-white">
     <div id="app" class="max-h-screen overflow-hidden">
       <div class="w-full bg-black relative">
-        <div id="render-area" class="w-full flex justify-center">
-          <canvas id="canvas" class="bg-white max-w-full" style="max-height: calc(100vh - 2.5rem)"></canvas>
+        <div id="player-area" class="w-full flex justify-center items-center">
+          <canvas id="canvas" class="bg-white"></canvas>
         </div>
-        <div class="px-2 absolute bg-black right-0 bottom-0 flex flex-col opacity-60">
+        <div
+          class="px-4 py-2 absolute bg-black right-0 bottom-0 flex flex-col opacity-60"
+        >
           Render Mode:
           <label>
             <input name="render-mode" value="block" checked type="radio" />

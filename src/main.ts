@@ -158,6 +158,23 @@ class VideoBuffer {
   canvas.width = CANVAS_W;
   canvas.height = CANVAS_H;
 
+  const playerArea = document.getElementById("player-area") as HTMLDivElement;
+
+  const resizeHandler = () => {
+    if (playerArea.offsetWidth / playerArea.offsetHeight < 4 / 3) {
+      // tall
+      playerArea.classList.remove("wide");
+      playerArea.classList.add("tall");
+    } else {
+      // wide
+      playerArea.classList.remove("tall");
+      playerArea.classList.add("wide");
+    }
+  };
+
+  window.addEventListener("resize", resizeHandler);
+  resizeHandler();
+
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     alert("no");
@@ -212,9 +229,7 @@ class VideoBuffer {
     }
   };
 
-  document
-    .getElementById("render-area")
-    ?.addEventListener("click", togglePlayState);
+  playerArea.addEventListener("click", togglePlayState);
   player.buttons.play.addEventListener("click", togglePlayState);
 
   player.bar.addEventListener("click", (event) => {

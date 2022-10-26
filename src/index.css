@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#player-area {
+  width: 100vw;
+  height: calc(100vh - 2.5rem);
+}
+
+#player-area.tall #canvas {
+  width: 100%;
+  height: auto;
+}
+
+#player-area.wide #canvas {
+  width: auto;
+  height: 100%;
+}
