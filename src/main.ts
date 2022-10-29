@@ -306,6 +306,11 @@ class VideoBuffer {
     volumeSlider: document.getElementById(
       "player-volume-slider"
     ) as HTMLInputElement,
+    containers: {
+      controls: document.getElementById(
+        "player-container-controls"
+      ) as HTMLDivElement,
+    },
     labels: {
       currentTime: document.getElementById(
         "player-current-time"
@@ -352,19 +357,70 @@ class VideoBuffer {
     else setVolume(0);
   });
 
+  let seekDragging = false;
+
+  const renderBarAtCurrentState = () => {
+    const progressPercentage = (audio.currentTime / audio.duration) * 100;
+    renderBarAtPercentage(progressPercentage);
+    player.labels.currentTime.innerText = formatTime(audio.currentTime);
+  };
+
+  player.seekHandle.addEventListener("mousedown", () => (seekDragging = true));
+  document.addEventListener("mouseleave", () => {
+    seekDragging = false;
+    renderBarAtCurrentState();
+  });
+
+  document.addEventListener("mouseup", (event) => {
+    if (seekDragging) {
+      seekDragging = false;
+      const rect = player.progressBar.parentElement?.getBoundingClientRect();
+      if (!rect) {
+        renderBarAtCurrentState();
+        return;
+      }
+
+      let newProgress = (event.screenX - rect.x) / rect.width;
+      if (newProgress < 0) newProgress = 0;
+      else if (newProgress > 1) newProgress = 1;
+
+      audio.currentTime = newProgress * audio.duration;
+    } else {
+      renderBarAtCurrentState();
+    }
+  });
+
+  const renderBarAtPercentage = (percentage: number) => {
+    if (percentage < 0) percentage = 0;
+    else if (percentage > 100) percentage = 100;
+
+    player.seekHandle.style.left = `${percentage}%`;
+    player.progressBar.style.width = `${percentage}%`;
+    player.labels.currentTime.innerText = formatTime(
+      (percentage / 100) * audio.duration
+    );
+  };
+
+  document.addEventListener("mousemove", (event) => {
+    if (seekDragging) {
+      const rect = player.progressBar.parentElement?.getBoundingClientRect();
+      if (!rect) return;
+
+      const percentage = ((event.screenX - rect.x) / rect.width) * 100;
+      renderBarAtPercentage(percentage);
+    }
+  });
+
+  audio.addEventListener("timeupdate", () => {
+    if (!seekDragging) renderBarAtCurrentState();
+  });
+
   player.bar.addEventListener("click", (event) => {
     const element = event.target as HTMLDivElement | undefined;
     if (!element) return;
 
     const newProgress = event.offsetX / element.offsetWidth;
     audio.currentTime = newProgress * audio.duration;
-  });
-
-  audio.addEventListener("timeupdate", () => {
-    const progressPercentage = (audio.currentTime / audio.duration) * 100;
-    player.seekHandle.style.left = `${progressPercentage}%`;
-    player.progressBar.style.width = `${progressPercentage}%`;
-    player.labels.currentTime.innerText = formatTime(audio.currentTime);
   });
 
   document.querySelectorAll('input[name="render-mode"]').forEach((item) => {

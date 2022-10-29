@@ -68,7 +68,8 @@
         </div>
       </div>
       <div
-        class="w-full h-10 bg-gradient-to-b from-gray-700 to-gray-900 border-t border-gray-800"
+        id="player-container-controls"
+        class="w-full h-10 bg-gradient-to-b from-gray-700 to-gray-900 border-t border-gray-800 select-none"
       >
         <div class="w-full h-full flex gap-4 items-center px-4">
           <button id="player-button-play">
@@ -112,7 +113,7 @@
               </div>
               <div
                 id="player-seek-handle"
-                class="h-4 w-4 -ml-2 absolute rounded-full -top-1 left-0 bg-red-600 drop-shadow-lg"
+                class="h-4 w-4 -ml-2 absolute rounded-full -top-1 left-0 bg-red-600 hover:bg-red-500 active:bg-red-700 drop-shadow-lg cursor-pointer"
               ></div>
             </div>
           </div>
