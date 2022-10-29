@@ -252,7 +252,7 @@ class VideoBuffer {
   const audio = document.getElementById("music") as HTMLAudioElement;
   audio.volume = VOLUME_CAP;
 
-  const getCurrentFrame = () => Math.floor(audio.currentTime * 30 + 6);
+  const getCurrentFrame = () => Math.floor(audio.currentTime * 30 + 30);
 
   audio.addEventListener("seeked", () => {
     buffer.loadChunkForFrame(getCurrentFrame());
