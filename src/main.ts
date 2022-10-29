@@ -260,6 +260,24 @@ class VideoBuffer {
     buffer.render(getCurrentFrame(), getContext());
   });
 
+  audio.addEventListener("play", () => {
+    player.buttons.play.innerHTML = '<i class="fa-solid fa-fw fa-pause"></i>';
+  });
+
+  audio.addEventListener("pause", () => {
+    player.buttons.play.innerHTML = '<i class="fa-solid fa-fw fa-play"></i>';
+  });
+
+  audio.addEventListener("volumechange", () => {
+    player.volumeSlider.value = `${(audio.volume / VOLUME_CAP) * 100}`;
+    if (audio.volume === 0)
+      player.buttons.volume.innerHTML =
+        '<i class="fa-solid fa-fw fa-volume-mute"></i>';
+    else
+      player.buttons.volume.innerHTML =
+        '<i class="fa-solid fa-fw fa-volume-high"></i>';
+  });
+
   let ctx = getContext();
 
   const changeScaling = (factor: number) => {
@@ -308,13 +326,8 @@ class VideoBuffer {
   };
 
   const togglePlayState = () => {
-    if (audio.paused) {
-      audio.play();
-      player.buttons.play.innerHTML = '<i class="fa-solid fa-fw fa-pause"></i>';
-    } else {
-      audio.pause();
-      player.buttons.play.innerHTML = '<i class="fa-solid fa-fw fa-play"></i>';
-    }
+    if (audio.paused) audio.play();
+    else audio.pause();
   };
 
   playerArea.addEventListener("click", togglePlayState);
@@ -326,17 +339,8 @@ class VideoBuffer {
     else panel.style.display = "none";
   });
 
-  const setVolume = (fullVolume: number) => {
-    const volume = fullVolume * VOLUME_CAP;
-    player.volumeSlider.value = `${fullVolume * 100}`;
-    audio.volume = volume;
-
-    if (volume === 0)
-      player.buttons.volume.innerHTML =
-        '<i class="fa-solid fa-fw fa-volume-mute"></i>';
-    else
-      player.buttons.volume.innerHTML =
-        '<i class="fa-solid fa-fw fa-volume-high"></i>';
+  const setVolume = (normalizedVolume: number) => {
+    audio.volume = normalizedVolume * VOLUME_CAP;
   };
 
   player.volumeSlider.addEventListener("change", () => {
