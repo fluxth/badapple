@@ -27,12 +27,37 @@ class VideoBuffer {
   private frameSizeBytes = 0;
   private chunks: { [index: number]: Uint8Array | null } = {};
   private prevFrameBuffer: Uint8Array | null = null;
+  private sprites: HTMLCanvasElement | null = null;
 
   forceFullRender = false;
   mode: RenderMode = RenderMode.Block;
 
   constructor() {
     this.frameSizeBytes = this.WIDTH * this.HEIGHT;
+  }
+
+  generateSprites(scaling: number) {
+    const sprites = document.createElement("canvas");
+    sprites.height = scaling;
+    sprites.width = scaling * ASCII_RAMP.length;
+
+    const ctx = sprites.getContext("2d");
+    if (!ctx) return;
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "ideographic";
+    ctx.font = `bold ${scaling}px Courier`;
+
+    if (this.mode === RenderMode.TextInverse) ctx.fillStyle = "white";
+    else ctx.fillStyle = "black";
+
+    for (let i = 0; i < ASCII_RAMP.length; ++i) {
+      const char = ASCII_RAMP[i];
+      const x = i * scaling;
+      ctx.fillText(char, x + scaling / 2, scaling, scaling);
+    }
+
+    this.sprites = sprites;
   }
 
   async loadChunk(chunkIndex: number) {
@@ -108,6 +133,11 @@ class VideoBuffer {
     if (!prevFrame || this.mode === RenderMode.Differential)
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+    if (!this.sprites) {
+      console.error("Sprites not found!");
+      return;
+    }
+
     for (let y = 0; y < this.HEIGHT; ++y) {
       for (let x = 0; x < this.WIDTH; ++x) {
         const color = frame[y * this.WIDTH + x];
@@ -135,13 +165,20 @@ class VideoBuffer {
           if (this.mode === RenderMode.TextInverse) luminance = 1 + -luminance;
 
           const charIndex = Math.floor(luminance * ASCII_RAMP.length);
-          const char = ASCII_RAMP[charIndex];
+          if (charIndex === undefined || charIndex === ASCII_RAMP.length - 1)
+            continue;
 
-          if (char === undefined || char === " ") continue;
-
-          ctx.fillStyle =
-            this.mode === RenderMode.TextInverse ? "white" : "black";
-          ctx.fillText(char, s * x + s / 2, s * y + s / 2, s);
+          ctx.drawImage(
+            this.sprites,
+            s * charIndex,
+            0,
+            s,
+            s,
+            s * x,
+            s * y,
+            s,
+            s
+          );
         } else if (
           this.mode === RenderMode.Size ||
           this.mode === RenderMode.SizeInverse
@@ -210,10 +247,6 @@ class VideoBuffer {
       throw "Unable to get context";
     }
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = `bold ${buffer.getScalingFactor(canvas)}px Courier`;
-
     return ctx;
   };
 
@@ -235,6 +268,7 @@ class VideoBuffer {
     canvas.height = buffer.HEIGHT * factor;
 
     ctx = getContext();
+    buffer.generateSprites(factor);
   };
 
   changeScaling(9); // default to 1080p
@@ -364,6 +398,7 @@ class VideoBuffer {
 
       buffer.forceFullRender = true;
       buffer.mode = mode;
+      buffer.generateSprites(buffer.getScalingFactor(canvas));
     });
   });
 })();
