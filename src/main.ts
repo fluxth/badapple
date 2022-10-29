@@ -84,7 +84,6 @@ class VideoBuffer {
   render(frameIndex: number, ctx: CanvasRenderingContext2D) {
     const chunkIndex = Math.floor(frameIndex / this.FRAMES_PER_CHUNK);
     const frameIndexInChunk = frameIndex % this.FRAMES_PER_CHUNK;
-    //console.log(chunkIndex, frameIndexInChunk);
 
     const chunk = this.chunks[chunkIndex];
     if (!chunk) {
@@ -361,7 +360,6 @@ class VideoBuffer {
     const progressPercentage = (audio.currentTime / audio.duration) * 100;
     player.seekHandle.style.left = `${progressPercentage}%`;
     player.progressBar.style.width = `${progressPercentage}%`;
-    //player.bufferBar.style.width = `${progressPercentage + 4}%`;
     player.labels.currentTime.innerText = formatTime(audio.currentTime);
   });
 
